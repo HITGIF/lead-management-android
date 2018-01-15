@@ -1,7 +1,6 @@
 package com.community.jboss.leadmanagement;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.Toolbar;
@@ -18,20 +17,13 @@ import butterknife.ButterKnife;
 public class SettingsActivity extends FragmentActivity {
     @BindView(R.id.settings_bar)
     Toolbar toolbar;
-    @BindView(R.id.switch1)
-    Switch toggle;
-
-    private static final String PREFS_NAME = "prefs";
-    private static final String PREF_DARK_THEME = "dark_theme";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        boolean useDarkTheme = preferences.getBoolean(PREF_DARK_THEME, false);
 
-        if(useDarkTheme) {
-            setTheme(R.style.AppTheme_Dark);
-        }
+        setTheme(this.getSharedPreferences(getString(R.string.shared_preferences_key), Context.MODE_PRIVATE)
+                .getBoolean(getString(R.string.KEY_DARK_MODE), false)
+                ? R.style.AppThemeDark : R.style.AppTheme);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
@@ -50,38 +42,5 @@ public class SettingsActivity extends FragmentActivity {
                 finish();
             }
         });
-
-        toggle.setChecked(useDarkTheme);
-        toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton view, boolean isChecked) {
-                toggleTheme(isChecked);
-                if (isChecked){
-                    MainActivity.useDarkTheme = true;
-                    EditContactActivity.useDarkTheme = true;
-                    Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
-                    startActivity(intent);
-                }
-                else {
-                    MainActivity.useDarkTheme = false;
-                    Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
-                    startActivity(intent);
-                }
-            }
-        });
-    }
-
-    private void toggleTheme(boolean darkTheme) {
-        SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
-        editor.putBoolean(PREF_DARK_THEME, darkTheme);
-        editor.apply();
-
-        Intent intent = getIntent();
-        finish();
-
-        startActivity(intent);
-
-        Intent i = new Intent(SettingsActivity.this, MainActivity.class);
-        startActivity(i);
     }
 }

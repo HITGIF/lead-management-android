@@ -9,6 +9,12 @@
             android:summary="current location"
             android:dialogMessage="change server location using this entry box."
             android:defaultValue="Default value"/>
+
+        <android.support.v7.preference.SwitchPreferenceCompat
+            android:key="@string/KEY_DARK_MODE"
+            android:title="Dark Mode"
+            android:defaultValue="0"/>
+
     </android.support.v7.preference.PreferenceCategory>
 
 </android.support.v7.preference.PreferenceScreen>

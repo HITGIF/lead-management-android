@@ -1,6 +1,7 @@
 package com.community.jboss.leadmanagement.main.contacts.editcontact;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -29,19 +30,14 @@ public class EditContactActivity extends AppCompatActivity {
     EditText contactNumberField;
 
     private EditContactActivityViewModel mViewModel;
-    public static boolean useDarkTheme;
-
-    private static final String PREFS_NAME = "prefs";
-    private static final String PREF_DARK_THEME = "dark_theme";
+    private boolean darkModeCache = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        boolean useDarkTheme = preferences.getBoolean(PREF_DARK_THEME, false);
 
-        if(useDarkTheme) {
-            setTheme(R.style.AppTheme_BG);
-        }
+        this.darkModeCache = this.getSharedPreferences(getString(R.string.shared_preferences_key), Context.MODE_PRIVATE)
+                .getBoolean(getString(R.string.KEY_DARK_MODE), false);
+        setTheme(darkModeCache ? R.style.Theme_Design_NoActionBar : R.style.Theme_Design_Light_NoActionBar);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_contact);
@@ -75,7 +71,8 @@ public class EditContactActivity extends AppCompatActivity {
             contactNumberField.setText(number);
         }
 
-        toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_close_black_24dp));
+        toolbar.setNavigationIcon(this.darkModeCache ? getResources().getDrawable(R.drawable.ic_close_24dp)
+                : getResources().getDrawable(R.drawable.ic_close_black_24dp));
         setSupportActionBar(toolbar);
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -136,6 +133,4 @@ public class EditContactActivity extends AppCompatActivity {
         }
         return true;
     }
-
-
 }

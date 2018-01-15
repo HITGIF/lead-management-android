@@ -12,8 +12,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        />
+        android:layout_marginBottom="5dp" />
 
     <TextView
         android:id="@+id/contact_name"
@@ -25,6 +24,7 @@
         android:layout_marginTop="12.5dp"
         android:layout_marginLeft="10dp"
         android:layout_marginStart="10dp"
+        style="@style/TextAppearance.AppCompat.Body1"
         android:layout_toLeftOf="@+id/contact_delete"
         android:layout_toStartOf="@+id/contact_delete"
         android:maxLines="1" />

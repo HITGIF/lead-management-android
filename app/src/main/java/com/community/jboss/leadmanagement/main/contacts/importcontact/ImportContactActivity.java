@@ -1,6 +1,7 @@
 package com.community.jboss.leadmanagement.main.contacts.importcontact;
 
 
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
@@ -36,6 +37,10 @@ public class ImportContactActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        setTheme(this.getSharedPreferences(getString(R.string.shared_preferences_key), Context.MODE_PRIVATE)
+                .getBoolean(getString(R.string.KEY_DARK_MODE), false) ? R.style.AppThemeDark_NoActionBar : R.style.AppTheme_NoActionBar);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_import_contact);
         setTitle(R.string.import_contacts);

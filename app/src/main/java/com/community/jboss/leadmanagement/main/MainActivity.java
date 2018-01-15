@@ -3,6 +3,7 @@ package com.community.jboss.leadmanagement.main;
 
 import android.Manifest;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -47,23 +48,17 @@ public class MainActivity extends AppCompatActivity
     private MainActivityViewModel mViewModel;
     private PermissionManager permissionManager;
 
-    private static final String PREFS_NAME = "prefs";
-    private static final String PREF_DARK_THEME = "dark_theme";
-    public static boolean useDarkTheme;
+    private boolean darkModeCache = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        useDarkTheme = preferences.getBoolean(PREF_DARK_THEME, false);
 
-        if(useDarkTheme) {
-            setTheme(R.style.AppTheme_BG);
-        }
+        this.darkModeCache = this.getSharedPreferences(getString(R.string.shared_preferences_key), Context.MODE_PRIVATE)
+                .getBoolean(getString(R.string.KEY_DARK_MODE), false);
+        setTheme(darkModeCache ? R.style.AppThemeDark_NoActionBar : R.style.AppTheme_NoActionBar);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        visibleBtn(useDarkTheme);
 
         mViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
@@ -81,6 +76,14 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+        navigationView.setItemTextColor(
+                darkModeCache ?
+                        getResources().getColorStateList(R.color.drawer_item_dark) :
+                        getResources().getColorStateList(R.color.drawer_item));
+        navigationView.setItemIconTintList(
+                darkModeCache ?
+                        getResources().getColorStateList(R.color.drawer_item_dark) :
+                        getResources().getColorStateList(R.color.drawer_item));
         navigationView.setNavigationItemSelectedListener(this);
 
         // Set initial selected item to Contacts
@@ -89,6 +92,17 @@ public class MainActivity extends AppCompatActivity
         }
 
         initFab();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (this.darkModeCache != this.getSharedPreferences(getString(R.string.shared_preferences_key), Context.MODE_PRIVATE)
+                .getBoolean(getString(R.string.KEY_DARK_MODE), false)) {
+            Intent refresh = new Intent(this, MainActivity.class);
+            startActivity(refresh);
+            this.finish();
+        }
     }
 
     private void selectInitialNavigationItem() {
@@ -149,14 +163,6 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_settings:
                 navigationItem = MainActivityViewModel.NavigationItem.SETTINGS;
                 break;
-            case R.id.toggle_theme:
-                darkTheme(true);
-                navigationItem = MainActivityViewModel.NavigationItem.CONTACTS;
-                break;
-            case R.id.light_theme:
-                darkTheme(false);
-                navigationItem = MainActivityViewModel.NavigationItem.CONTACTS;
-                break;
             default:
                 Timber.e("Failed to resolve selected navigation item id");
                 throw new IllegalArgumentException();
@@ -181,12 +187,6 @@ public class MainActivity extends AppCompatActivity
             case SETTINGS:
                 startActivity(new Intent(this, SettingsActivity.class));
                 return;
-            case TOGGLE_THEME:
-                darkTheme(true);
-
-                return;
-            case LIGHT_THEME:
-                darkTheme(false);
             default:
                 Timber.e("Failed to resolve selected NavigationItem");
                 throw new IllegalArgumentException();
@@ -205,32 +205,4 @@ public class MainActivity extends AppCompatActivity
             fab.setImageResource(R.drawable.ic_add_white_24dp);
         }
     }
-
-    private void darkTheme(boolean darkTheme) {
-        SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
-        editor.putBoolean(PREF_DARK_THEME, darkTheme);
-        editor.apply();
-
-        Intent intent = getIntent();
-        finish();
-
-        startActivity(intent);
-    }
-
-    private void visibleBtn(boolean darkTheme){
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        Menu menu = navigationView.getMenu();
-        MenuItem darkBtn = menu.findItem(R.id.toggle_theme);
-        MenuItem lightBtn = menu.findItem(R.id.light_theme);
-
-        if (darkTheme){
-            darkBtn.setVisible(false);
-            lightBtn.setVisible(true);
-        }
-        else {
-            darkBtn.setVisible(true);
-            lightBtn.setVisible(false);
-        }
-    }
-
 }
